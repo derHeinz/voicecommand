@@ -30,7 +30,6 @@ def log(txt):
     #f.write(txt + "\n")
     #f.close()
     
-    
 if (len(sys.argv) > 1):
     vc = sys.argv[1]
     log(vc)
