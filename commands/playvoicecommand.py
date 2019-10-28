@@ -1,26 +1,15 @@
-import os
-from .voicecommand import VoiceCommand
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
-class PlayVoiceCommand(VoiceCommand):
+from .voicecommand import ConfigurableVoiceCommand
+
+class PlayVoiceCommand(ConfigurableVoiceCommand):
     
-    SIGNAL_WORDS = ["spiele", "spiel"]
+    SIGNAL_WORDS = ["spiel", "spiele"]
     ARTIST_ONLY = ["etwas", "was"]
     ARTIST = "von"
     TARGET = "auf"
     
-    def __init__(self, config=None):
-        self.SIGNAL_WORDS.sort(key=len)
-        if (config == None):
-            self._load_config_file()
-        else:
-            self._load_config(config)
-        
-    def _load_config_file(self):
-        config_filename = os.path.dirname(__file__) + "/dlna.json" 
-        with open(config_filename) as data_file:    
-            data = json.load(data_file)
-            self._load_config(data)
-            
     def _load_config(self, data):
         self.RENDERERS = data['renderers']
         self.SERVERS = data['servers']

@@ -1,23 +1,14 @@
-from .voicecommand import VoiceCommand
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
-class SwitchItemsVoiceCommand(VoiceCommand):
+from .voicecommand import ConfigurableVoiceCommand
+
+class SwitchItemsVoiceCommand(ConfigurableVoiceCommand):
 
     COMMAND_MAPPINGS = {"an": "ON" ,"anmachen": "ON", "ein" : "ON", "einschalten": "ON",
         "aus": "OFF", "ausschalten": "OFF", "ausmachen": "OFF"
     }
-    
-    def __init__(self, config=None):
-        if (config == None):
-            self._load_config_file()
-        else:
-            self._load_config(config)
-        
-    def _load_config_file(self):
-        config_filename = os.path.dirname(__file__) + "/words_to_items.json" 
-        with open(config_filename) as data_file:    
-            data = json.load(data_file)
-            self._load_config(data)
-            
+
     def _load_config(self, data):
         self.WORDS_TO_ITEMS = data
     

@@ -1,36 +1,18 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import os
-from .voicecommand import VoiceCommand
+from .voicecommand import ConfigurableVoiceCommand
 
-class AlarmClockVoiceCommand(VoiceCommand):
+class AlarmClockVoiceCommand(ConfigurableVoiceCommand):
 
-    START_TOKEN = ["Stelle Wecker auf", "Wecker auf", "Stelle Wecker um"]
-    OFF_TOKEN = ["Wecker aus"]
+    START_TOKEN = ["Stelle Wecker auf", "Stelle Wecker um", "Wecker auf"]
     
-    def __init__(self, config=None):
-        self.START_TOKEN.sort(key=len, reverse=True)
-        if (config == None):
-            self._load_config_file()
-        else:
-            self._load_config(config)
-        
-    def _load_config_file(self):
-        config_filename = os.path.dirname(__file__) + "/alarmclock.json" 
-        with open(config_filename) as data_file:    
-            data = json.load(data_file)
-            self._load_config(data)
-            
     def _load_config(self, data):
         self.ALARMCLOCKIP = data['ip']
     
     def can_process(self, vc):
         for keyword in self.START_TOKEN:
             if vc.lower().startswith(keyword.lower()):
-                return True
-        for keyword in self.OFF_TOKEN:
-            if (vc.lower() == keyword.lower()):
                 return True
         return False
         
@@ -100,18 +82,9 @@ class AlarmClockVoiceCommand(VoiceCommand):
         time = self._legal_time_format(rest)
         return time
         
-    def _is_deactivate(self, vc):
-        for keyword in self.OFF_TOKEN:
-            if (vc.lower() == keyword.lower()):
-                return True
-        return False
-        
     def process(self, vc):
         
         from raspberrypi_python import radioalarmclockIntegration
         r = radioalarmclockIntegration.RadioAlarmClock(self.ALARMCLOCKIP)
-        if (self._is_deactivate(vc)):
-            r.set_alarm(False)
-        else:
-            alarmtime = self._extract_time(vc)
-            r.set_alarmtime(alarmtime)
+        alarmtime = self._extract_time(vc)
+        r.set_alarmtime(alarmtime)
