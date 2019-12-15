@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from .voicecommand import ConfigurableVoiceCommand
+from .process_result import ProcessResult
 
 class SwitchItemsVoiceCommand(ConfigurableVoiceCommand):
 
@@ -30,7 +31,7 @@ class SwitchItemsVoiceCommand(ConfigurableVoiceCommand):
         if sw is None:
             return False
         return True
-    
+            
     def can_process(self, vc):
         return self._contains_signal_word(vc)
         
@@ -42,4 +43,7 @@ class SwitchItemsVoiceCommand(ConfigurableVoiceCommand):
         from raspberrypi_python import postopenhab
         for item in extracted_items:
             postopenhab.post_value_to_openhab(item, command)
+            
+        items_text = ', '.join(extracted_items)
         
+        return ProcessResult("Ein/Aus Schalter", True, "Setzte " + items_text + " auf " + command)

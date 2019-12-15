@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from .voicecommand import ConfigurableVoiceCommand
+from .process_result import ProcessResult
 
 class PlayVoiceCommand(ConfigurableVoiceCommand):
     
@@ -22,7 +23,7 @@ class PlayVoiceCommand(ConfigurableVoiceCommand):
         if (name is not None) and (name in self.RENDERERS):
             return self.RENDERERS[name]
         return next(iter(self.RENDERERS.values()))
-        
+                
     def can_process(self, vc):
         for k in self.SIGNAL_WORDS:
             if k in vc.lower():
@@ -81,18 +82,25 @@ class PlayVoiceCommand(ConfigurableVoiceCommand):
         ms_url = self._get_server_url(None)
         ms = MediaServer(ms_url)
         log('searching for title="{t}" of artist="{a}"'.format(t=ti, a=ar))
-        res = ms.search(title=ti, artist=ar)
+        search_res = ms.search(title=ti, artist=ar)
+        log('Found {} items'.format(search_res.get_matches()))
         
-        log('Found {} items'.format(res.get_matches()))
-        if (res.get_matches() > 0):
-            item = res.random_item()
+        succ = False
+        result_text = ""
+        if (search_res.get_matches() > 0):
+            item = search_res.random_item()
             log(item.get_url())
             renderer_url = self._get_renderer_url(tar)
             player = Player(Renderer(tar, renderer_url, True))
             log('Playername: "{p}", Player URL: "{u}"'.format(p=tar, u=renderer_url))
             player.play(item.get_url(), item=item)
-            return True
-        return False
+            succ = True
+            result_text = 'spielt "{t}" von "{a}"'.format(t=item.get_title(), a=item.get_actor())
+        else:
+            succ = False
+            result_text = "Kein passenden Titel gefunden"
+        log(result_text)
+        return ProcessResult("Media Player", succ, result_text)
         
 def log(txt):
     pass

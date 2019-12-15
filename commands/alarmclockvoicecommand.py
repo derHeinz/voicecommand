@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from .voicecommand import ConfigurableVoiceCommand
+from .process_result import ProcessResult
 
 class AlarmClockVoiceCommand(ConfigurableVoiceCommand):
 
@@ -9,7 +10,7 @@ class AlarmClockVoiceCommand(ConfigurableVoiceCommand):
     
     def _load_config(self, data):
         self.ALARMCLOCKIP = data['ip']
-    
+        
     def can_process(self, vc):
         for keyword in self.START_TOKEN:
             if vc.lower().startswith(keyword.lower()):
@@ -88,3 +89,6 @@ class AlarmClockVoiceCommand(ConfigurableVoiceCommand):
         r = radioalarmclockIntegration.RadioAlarmClock(self.ALARMCLOCKIP)
         alarmtime = self._extract_time(vc)
         r.set_alarmtime(alarmtime)
+        
+        return ProcessResult("Wecker", True, "Weckerzeit " + alarmtime)
+        

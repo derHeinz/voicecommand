@@ -3,6 +3,7 @@ import json
 import inspect
 import os
 
+from commands.process_result import ProcessResult
 from commands.playvoicecommand import PlayVoiceCommand
 from commands.switchitemsvoicecommand import SwitchItemsVoiceCommand
 from commands.alarmclockvoicecommand import AlarmClockVoiceCommand
@@ -23,7 +24,15 @@ def reference_modules():
     cmd_folder = os.path.realpath(os.path.abspath(os.path.split(inspect.getfile( inspect.currentframe() ))[0]))    
     cmd_parent_folder = os.path.normpath(os.path.join(cmd_folder, ".."))
     sys.path.insert(0, cmd_parent_folder)
-
+def send_data_to_openhab(result):
+    data = config_helper.load_config_file("/voiceconfig.json")
+    
+    msg = result.get_message()
+    processor = result.get_type()
+    
+    from raspberrypi_python import postopenhab
+    postopenhab.post_value_to_openhab(data['openhab_processor_name_item'], processor)
+    postopenhab.post_value_to_openhab(data['openhab_processor_result_item'], msg)
 def log(txt):
     print(txt)
     #f = open("/tmp/a.txt","a+")
@@ -36,7 +45,11 @@ if (len(sys.argv) > 1):
     procs = filter(lambda p : p.can_process(vc), load_processors())
     
     reference_modules()
+    result = None
     
     for p in procs:
         log("processing {}".format(p))
-        p.process(vc)
+        result = p.process(vc)
+
+    if result is not None:
+        send_data_to_openhab(result)
