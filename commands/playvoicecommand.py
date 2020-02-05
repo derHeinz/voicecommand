@@ -10,6 +10,7 @@ class PlayVoiceCommand(ConfigurableVoiceCommand):
     ARTIST_ONLY = ["etwas", "was"]
     ARTIST = "von"
     TARGET = "auf"
+    STRIP_CHARS = ";,. "
     
     def _load_config(self, data):
         self.RENDERERS = data['renderers']
@@ -62,9 +63,9 @@ class PlayVoiceCommand(ConfigurableVoiceCommand):
             
         if (title is None):
             # parse artist anyway
-            title = rest.strip()
+            title = rest.strip(self.STRIP_CHARS)
         if (artist_contained and artist is None):
-            artist = rest.strip()
+            artist = rest.strip(self.STRIP_CHARS)
             
         # case someone say's "spiel(e) (et)was von ARTIST"
         if title.lower() in self.ARTIST_ONLY:

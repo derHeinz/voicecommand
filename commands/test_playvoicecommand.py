@@ -21,7 +21,11 @@ class TestPlayVoiceCommand(unittest.TestCase):
     def test_parse_title_artist_target(self):
         self.assertEqual(("Show must go on", None, None), self._testee()._parse_title_artist_target("spiel Show must go on"))
         self.assertEqual(("Show must go on", None, None), self._testee()._parse_title_artist_target("spiele Show must go on"))
+        self.assertEqual(("Show must go on", None, None), self._testee()._parse_title_artist_target("spiele Show must go on;"))
         self.assertEqual(("Show must go on", "Queen", None), self._testee()._parse_title_artist_target("spiel Show must go on von Queen"))
         self.assertEqual(("Show must go on", "Queen", None), self._testee()._parse_title_artist_target("spiele Show must go on von Queen"))
+        self.assertEqual(("Show must go on", "Queen", None), self._testee()._parse_title_artist_target("spiel Show must go on von Queen."))
         self.assertEqual((None, "Queen", None), self._testee()._parse_title_artist_target("spiele etwas von Queen"))
         self.assertEqual((None, "Queen", None), self._testee()._parse_title_artist_target("spiele was von Queen"))
+        self.assertEqual((None, "Rammstein", None), self._testee()._parse_title_artist_target("spiele was von Rammstein."))
+        self.assertEqual((None, "Rammstein", None), self._testee()._parse_title_artist_target("spiele was von Rammstein "))
