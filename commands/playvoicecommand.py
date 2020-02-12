@@ -6,7 +6,7 @@ from .process_result import ProcessResult
 
 class PlayVoiceCommand(ConfigurableVoiceCommand):
     
-    SIGNAL_WORDS = ["spiel", "spiele"]
+    SIGNAL_WORDS = ["spiele", "spiel"]
     ARTIST_ONLY = ["etwas", "was"]
     ARTIST = "von"
     TARGET = "auf"
@@ -36,12 +36,12 @@ class PlayVoiceCommand(ConfigurableVoiceCommand):
         artist = None
         target = None
         artist_contained = False
-                
-        rest = vc
+
+        rest = vc.strip(self.STRIP_CHARS)
         # cut away signal word: rest is like SINGAL_WORD...
         for k in self.SIGNAL_WORDS:
-            if k in vc.lower():
-                rest = vc[len(k):].strip()
+            if k in rest.lower():
+                rest = rest[len(k):].strip()
                 
         # cut away artist: rest is like <title>ARTIST...
         if self.ARTIST in rest.lower():
@@ -63,9 +63,9 @@ class PlayVoiceCommand(ConfigurableVoiceCommand):
             
         if (title is None):
             # parse artist anyway
-            title = rest.strip(self.STRIP_CHARS)
+            title = rest.strip()
         if (artist_contained and artist is None):
-            artist = rest.strip(self.STRIP_CHARS)
+            artist = rest.strip()
             
         # case someone say's "spiel(e) (et)was von ARTIST"
         if title.lower() in self.ARTIST_ONLY:

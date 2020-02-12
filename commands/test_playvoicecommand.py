@@ -10,7 +10,8 @@ class TestPlayVoiceCommand(unittest.TestCase):
         return PlayVoiceCommand({"renderers":{"Radio":"url"}, "servers":{"test": "url"}})
 
     def test_can_process(self):
-        positive_list = ["spiele Lied", "spiel Heavy von Queen", "spiel Bohemian", "spiele eine Lied"]
+        positive_list = ["spiele Lied", "spiel Heavy von Queen", "spiel Bohemian", "spiele eine Lied", 
+        "Spiele etwas von Queen.", "spiel Show must go on.", "spiel Show must go on "]
         for text in positive_list:
             self.assertTrue(self._testee().can_process(text))
             
@@ -28,4 +29,4 @@ class TestPlayVoiceCommand(unittest.TestCase):
         self.assertEqual((None, "Queen", None), self._testee()._parse_title_artist_target("spiele etwas von Queen"))
         self.assertEqual((None, "Queen", None), self._testee()._parse_title_artist_target("spiele was von Queen"))
         self.assertEqual((None, "Rammstein", None), self._testee()._parse_title_artist_target("spiele was von Rammstein."))
-        self.assertEqual((None, "Rammstein", None), self._testee()._parse_title_artist_target("spiele was von Rammstein "))
+        self.assertEqual((None, "Rammstein", None), self._testee()._parse_title_artist_target("Spiele was von Rammstein "))

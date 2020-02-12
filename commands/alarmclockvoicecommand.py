@@ -7,6 +7,7 @@ from .process_result import ProcessResult
 class AlarmClockVoiceCommand(ConfigurableVoiceCommand):
 
     START_TOKEN = ["Stelle Wecker auf", "Stelle Wecker um", "Wecker auf"]
+    STRIP_CHARS = ";,. "
     
     def _load_config(self, data):
         self.ALARMCLOCKIP = data['ip']
@@ -71,7 +72,7 @@ class AlarmClockVoiceCommand(ConfigurableVoiceCommand):
             return hour + ":00"
             
     def _extract_time(self, vc):
-        rest = vc.lower()
+        rest = vc.lower().strip(self.STRIP_CHARS)
         for keyword in self.START_TOKEN:
             if rest.startswith(keyword.lower()):
                 rest = rest[len(keyword.lower()):]

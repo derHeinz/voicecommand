@@ -11,7 +11,7 @@ class TestAlarmClockVoiceCommand(unittest.TestCase):
         
     def test_can_process(self):
         positive_list = ["Wecker auf 8", "Wecker auf acht", "Stelle Wecker auf 6 Uhr 30", 
-        "Stelle Wecker auf 6 Uhr dreißg", "Stelle Wecker auf sechs Uhr dreißig"]
+        "Stelle Wecker auf 6 Uhr dreißg", "Stelle Wecker auf sechs Uhr dreißig", "Stelle Wecker auf 6"]
         
         for text in positive_list:
             self.assertTrue(self._testee().can_process(text))
@@ -31,3 +31,6 @@ class TestAlarmClockVoiceCommand(unittest.TestCase):
         self.assertEqual("11:30", self._testee()._extract_time("Wecker auf elf dreißig"))
         self.assertEqual("11:30", self._testee()._extract_time("Stelle Wecker auf elf dreißig"))
         self.assertEqual("11:30", self._testee()._extract_time("Stelle Wecker auf elf dreißig Uhr"))
+        
+        self.assertEqual("11:00", self._testee()._extract_time("Stelle Wecker auf 11 Uhr."))
+        self.assertEqual("11:00", self._testee()._extract_time(" stelle Wecker auf 11 Uhr "))
