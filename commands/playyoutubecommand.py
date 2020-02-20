@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from urllib.parse import quote
+from urllib.request import urlopen, Request
+
 from .voicecommand import ConfigurableVoiceCommand
 from .process_result import ProcessResult
 
@@ -33,7 +36,7 @@ class PlayYoutubeVoiceCommand(ConfigurableVoiceCommand):
         return rest
         
     def _get_audio_file(self, baseurl, searchquery):
-        searchquery_escaped = urllib.parse.quote(searchquery)
+        searchquery_escaped = quote(searchquery)
         url = baseurl + '/search/' + searchquery_escaped
         header = {"Content-Type":"text/plain"}
         req = Request(url, None, header)
@@ -42,7 +45,7 @@ class PlayYoutubeVoiceCommand(ConfigurableVoiceCommand):
         path_to_audiofile = path_to_audiofile.decode('UTF-8')
         path_to_audiofile = path_to_audiofile.strip() # remove trailing line feed
 
-        escaped_path_to_audiofile = urllib.parse.quote(path_to_audiofile)
+        escaped_path_to_audiofile = quote(path_to_audiofile)
         return baseurl + escaped_path_to_audiofile
         
     def process(self, vc):
