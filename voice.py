@@ -7,6 +7,8 @@ from commands.process_result import ProcessResult
 from commands.playvoicecommand import PlayVoiceCommand
 from commands.switchitemsvoicecommand import SwitchItemsVoiceCommand
 from commands.alarmclockvoicecommand import AlarmClockVoiceCommand
+from commands.playyoutubecommand import PlayYoutubeVoiceCommand
+
 import config_helper
 
 def load_processors():
@@ -14,6 +16,7 @@ def load_processors():
     processors.append(load_processor("/words_to_items.json", SwitchItemsVoiceCommand))
     processors.append(load_processor("/dlna.json", PlayVoiceCommand))
     processors.append(load_processor("/alarmclock.json", AlarmClockVoiceCommand))
+    processors.append(load_processor("/playyoutube.json", PlayYoutubeVoiceCommand))
     return processors
     
 def load_processor(config_filename, clazz):
@@ -24,6 +27,7 @@ def reference_modules():
     cmd_folder = os.path.realpath(os.path.abspath(os.path.split(inspect.getfile( inspect.currentframe() ))[0]))    
     cmd_parent_folder = os.path.normpath(os.path.join(cmd_folder, ".."))
     sys.path.insert(0, cmd_parent_folder)
+    
 def send_data_to_openhab(result):
     data = config_helper.load_config_file("/voiceconfig.json")
     
@@ -33,11 +37,9 @@ def send_data_to_openhab(result):
     from raspberrypi_python import postopenhab
     postopenhab.post_value_to_openhab(data['openhab_processor_name_item'], processor)
     postopenhab.post_value_to_openhab(data['openhab_processor_result_item'], msg)
+    
 def log(txt):
     print(txt)
-    #f = open("/tmp/a.txt","a+")
-    #f.write(txt + "\n")
-    #f.close()
     
 if (len(sys.argv) > 1):
     vc = sys.argv[1]
