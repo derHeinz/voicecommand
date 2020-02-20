@@ -27,7 +27,7 @@ class PlayVoiceCommand(ConfigurableVoiceCommand):
                 
     def can_process(self, vc):
         for k in self.SIGNAL_WORDS:
-            if k in vc.lower():
+            if vc.lower().startswith(k):
                 return True
         return False
         

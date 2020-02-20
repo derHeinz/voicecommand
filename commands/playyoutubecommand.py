@@ -57,7 +57,7 @@ class PlayYoutubeVoiceCommand(ConfigurableVoiceCommand):
         from dlna.renderer import Renderer
         from dlna.player import Player
         
-        renderer_url = self._get_renderer_url(tar)
+        renderer_url = self._get_renderer_url(None)
         player = Player(Renderer(tar, renderer_url, False))
         
         player.play(audio_url)

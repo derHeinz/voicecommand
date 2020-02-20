@@ -15,7 +15,7 @@ class TestPlayVoiceCommand(unittest.TestCase):
         for text in positive_list:
             self.assertTrue(self._testee().can_process(text))
             
-        negative_list = ["etwas ist passiert", "mache Licht an", "Fernseher aus"]
+        negative_list = ["etwas ist passiert", "mache Licht an", "Fernseher aus", "Spotify spiele Titel"]
         for text in negative_list:
             self.assertFalse(self._testee().can_process(text))
             
