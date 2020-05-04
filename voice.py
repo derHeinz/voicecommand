@@ -28,15 +28,20 @@ def reference_modules():
     cmd_parent_folder = os.path.normpath(os.path.join(cmd_folder, ".."))
     sys.path.insert(0, cmd_parent_folder)
     
-def send_data_to_openhab(result):
-    data = config_helper.load_config_file("/voiceconfig.json")
+def send_data_to_openhab(result, vc):
+    config_data = config_helper.load_config_file("/voiceconfig.json")
     
-    msg = result.get_message()
-    processor = result.get_type()
+    msg = "nicht verarbeitbar: '{}'".format(vc)
+    processor = "kein Prozessor"
+    if result is not None:
+        msg = result.get_message()
+        processor = result.get_type()
     
     from raspberrypi_python import postopenhab
-    postopenhab.post_value_to_openhab(data['openhab_processor_name_item'], processor)
-    postopenhab.post_value_to_openhab(data['openhab_processor_result_item'], msg)
+    postopenhab.post_value_to_openhab(config_data['openhab_processor_name_item'], processor)
+    postopenhab.post_value_to_openhab(config_data['openhab_processor_result_item'], msg)
+    
+    
     
 def log(txt):
     print(txt)
@@ -53,5 +58,4 @@ if (len(sys.argv) > 1):
         log("processing {}".format(p))
         result = p.process(vc)
 
-    if result is not None:
-        send_data_to_openhab(result)
+    send_data_to_openhab(result, vc)
