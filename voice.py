@@ -20,7 +20,7 @@ def load_processors():
     return processors
     
 def load_processor(clazz, *config_filenames):
-    config = config_helper.load_config_files(config_filenames)
+    config = config_helper.load_config_files(*config_filenames)
     return clazz(config)
     
 def reference_modules():
