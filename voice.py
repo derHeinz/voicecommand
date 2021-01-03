@@ -29,7 +29,7 @@ def reference_modules():
     sys.path.insert(0, cmd_parent_folder)
     
 def send_data_to_openhab(result, vc):
-    config_data = config_helper.load_config_file("/voiceconfig.json")
+    config_data = config_helper.load_config_files("/voiceconfig.json")
     
     msg = "nicht verarbeitbar: '{}'".format(vc)
     processor = "kein Prozessor"
