@@ -13,15 +13,15 @@ import config_helper
 
 def load_processors():
     processors = []
-    processors.append(load_processor("/words_to_items.json", SwitchItemsVoiceCommand))
-    processors.append(load_processor("/dlna.json", PlayVoiceCommand))
-    processors.append(load_processor("/alarmclock.json", AlarmClockVoiceCommand))
-    processors.append(load_processor("/playyoutube.json", PlayYoutubeVoiceCommand))
+    processors.append(load_processor(SwitchItemsVoiceCommand, "/words_to_items.json"))
+    processors.append(load_processor(PlayVoiceCommand, "/renderers.json", "/dlna.json"))
+    processors.append(load_processor(AlarmClockVoiceCommand, "/alarmclock.json"))
+    processors.append(load_processor(PlayYoutubeVoiceCommand, "/renderers.json", "/playyoutube.json"))
     return processors
     
-def load_processor(config_filename, clazz):
-    data = config_helper.load_config_file(config_filename)
-    return clazz(data)
+def load_processor(clazz, *config_filenames):
+    config = config_helper.load_config_files(config_filenames)
+    return clazz(config)
     
 def reference_modules():
     cmd_folder = os.path.realpath(os.path.abspath(os.path.split(inspect.getfile( inspect.currentframe() ))[0]))    
@@ -40,7 +40,6 @@ def send_data_to_openhab(result, vc):
     from raspberrypi_python import postopenhab
     postopenhab.post_value_to_openhab(config_data['openhab_processor_name_item'], processor)
     postopenhab.post_value_to_openhab(config_data['openhab_processor_result_item'], msg)
-    
     
     
 def log(txt):
