@@ -3,6 +3,7 @@
 
 from urllib.parse import quote
 from urllib.request import urlopen, Request
+import json
 
 from .voicecommand import ConfigurableVoiceCommand
 from .process_result import ProcessResult
@@ -47,15 +48,37 @@ class PlayYoutubeVoiceCommand(ConfigurableVoiceCommand):
 
         escaped_path_to_audiofile = quote(path_to_audiofile)
         return baseurl + escaped_path_to_audiofile
+
+    def _get_audio_info(self, baseurl, searchquery):
+        searchquery_escaped = quote(searchquery)
+        url = baseurl + '/searchv2/' + searchquery_escaped
+        header = {"Content-Type":"text/plain"}
+        req = Request(url, None, header)
+        call_result = urlopen(req).read() # will download and return info including url to the audio file
+        json_result = json.loads(call_result.decode('UTF-8'))
+        
+        info = json_result
+        info['absolutePath'] = baseurl + quote(json_result['path'])
+
+        return info
         
     def process(self, vc):
         search_query = self._extract_search_query(vc)
         
-        audio_url = self._get_audio_file(self.provider_url, search_query)
+        # old way
+        #audio_url = self._get_audio_file(self.provider_url, search_query)
+        info = self._get_audio_info(self.provider_url, search_query)
+        audio_url = info['absolutePath']
+
+        message = None
+        if (info.get('title', None) != None):
+            message = "Spielt %s" % info['title']
+        else:
+            message = "Spielt Datei %s" % info['filename'] 
         
         # make a DLNA player and player
-        from dlna.renderer import Renderer
-        from dlna.player import Player
+        from dlna.dlna.renderer import Renderer
+        from dlna.dlna.player import Player
         
         target_name = None
         renderer_url = self._get_renderer_url(target_name)
@@ -63,5 +86,5 @@ class PlayYoutubeVoiceCommand(ConfigurableVoiceCommand):
         
         player.play(audio_url)
         
-        return ProcessResult("Youtube Media Player", True, "Spiele titel")
+        return ProcessResult("Youtube Media Player", True, message)
         

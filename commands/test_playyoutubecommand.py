@@ -10,7 +10,7 @@ class TestPlayYoutubeVoiceCommand(unittest.TestCase):
         return PlayYoutubeVoiceCommand({"renderers":{"Radio":"url"}, "youtube_audio_provider_url":"url"})
 
     def test_can_process(self):
-        positive_list = ["Youtube spiele Queen", "youtube spiel Heavy von Queen", "youtube spiel Another One bite the dust"]
+        positive_list = ["Youtube spiele Queen", "youtube spiel Heavy von Queen", "youtube spiel Another One bite the dust", "YouTube spiele meine Oma fährt im Hühnerstall Motorrad"]
         for text in positive_list:
             self.assertTrue(self._testee().can_process(text))
             
@@ -20,6 +20,6 @@ class TestPlayYoutubeVoiceCommand(unittest.TestCase):
             
     def test_extract_search_query(self):
         self.assertEqual("Show must go on", self._testee()._extract_search_query("Youtube spiele Show must go on"))
-        self.assertEqual("Show must go on", self._testee()._extract_search_query("Youtube spiel Show must go on"))
+        self.assertEqual("Show must go on", self._testee()._extract_search_query("YouTube spiel Show must go on"))
         self.assertEqual("Show must go on", self._testee()._extract_search_query("Youtube spiel Show must go on;"))
         self.assertEqual("Queen", self._testee()._extract_search_query("Youtube spiele Queen"))
