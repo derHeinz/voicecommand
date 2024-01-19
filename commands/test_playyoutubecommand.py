@@ -1,8 +1,6 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 import unittest
 from .playyoutubecommand import PlayYoutubeVoiceCommand
+
 
 class TestPlayYoutubeVoiceCommand(unittest.TestCase):
 
