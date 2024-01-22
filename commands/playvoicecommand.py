@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 from .voicecommand import ConfigurableVoiceCommand
 from .process_result import ProcessResult
 
