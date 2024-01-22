@@ -11,11 +11,11 @@ class TestPlayYoutubeVoiceCommand(unittest.TestCase):
         positive_list = ["Youtube spiele Queen", "youtube spiel Heavy von Queen", "youtube spiel Another One bite the dust", "YouTube spiele meine Oma fährt im Hühnerstall Motorrad"]
         for text in positive_list:
             self.assertTrue(self._testee().can_process(text))
-            
+
         negative_list = ["youtube Queen", "Queen youtube spiel"]
         for text in negative_list:
             self.assertFalse(self._testee().can_process(text))
-            
+
     def test_extract_search_query(self):
         self.assertEqual("Show must go on", self._testee()._extract_search_query("Youtube spiele Show must go on"))
         self.assertEqual("Show must go on", self._testee()._extract_search_query("YouTube spiel Show must go on"))

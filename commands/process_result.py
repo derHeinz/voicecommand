@@ -1,7 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
-
 class ProcessResult():
 
     def __init__(self, t, s, m):

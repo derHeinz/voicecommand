@@ -69,10 +69,10 @@ class PlayYoutubeVoiceCommand(ConfigurableVoiceCommand):
         audio_url = info['absolutePath']
 
         message = None
-        if (info.get('title', None) != None):
+        if (info.get('title', None) is not None):
             message = "Spielt %s" % info['title']
         else:
-            message = "Spielt Datei %s" % info['filename'] 
+            message = "Spielt Datei %s" % info['filename']
 
         # make a DLNA player and player
         from dlna.dlna.renderer import Renderer

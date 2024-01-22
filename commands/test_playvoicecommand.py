@@ -28,4 +28,3 @@ class TestPlayVoiceCommand(unittest.TestCase):
         self.assertEqual((None, "Queen", None), self._testee()._parse_title_artist_target("spiele was von Queen"))
         self.assertEqual((None, "Rammstein", None), self._testee()._parse_title_artist_target("spiele was von Rammstein."))
         self.assertEqual((None, "Rammstein", None), self._testee()._parse_title_artist_target("Spiele was von Rammstein "))
-

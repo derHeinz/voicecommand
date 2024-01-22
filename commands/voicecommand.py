@@ -1,5 +1,3 @@
-
-
 class VoiceCommand():
 
     def can_process(self, vc):
