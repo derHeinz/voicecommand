@@ -13,9 +13,9 @@ import config_helper
 def load_processors():
     processors = []
     processors.append(load_processor(SwitchItemsVoiceCommand, "/words_to_items.json"))
-    processors.append(load_processor(PlayVoiceCommand, "/renderers.json", "/dlna.json"))
+    processors.append(load_processor(PlayVoiceCommand, "/dlna_mediacontroller.json", "/dlna.json"))
     processors.append(load_processor(AlarmClockVoiceCommand, "/alarmclock.json"))
-    processors.append(load_processor(PlayYoutubeVoiceCommand, "/renderers.json", "/playyoutube.json"))
+    processors.append(load_processor(PlayYoutubeVoiceCommand, "/dlna_mediacontroller.json", "/playyoutube.json"))
     return processors
 
 

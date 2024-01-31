@@ -11,14 +11,11 @@ class PlayYoutubeVoiceCommand(ConfigurableVoiceCommand):
     SIGNAL_WORDS = ["youtube spiele", "youtube spiel"]
     STRIP_CHARS = ";,. "
 
-    def _load_config(self, data):
-        self.RENDERERS = data['renderers']
-        self.provider_url = data['youtube_audio_provider_url']
+    media_controller_url: str
 
-    def _get_renderer_url(self, name):
-        if (name is not None) and (name in self.RENDERERS):
-            return self.RENDERERS[name]
-        return next(iter(self.RENDERERS.values()))
+    def _load_config(self, data):
+        self.media_controller_url = data['media_controller_url']
+        self.provider_url = data['youtube_audio_provider_url']
 
     def can_process(self, vc):
         for k in self.SIGNAL_WORDS:
@@ -60,11 +57,16 @@ class PlayYoutubeVoiceCommand(ConfigurableVoiceCommand):
 
         return info
 
+    def _send_to_mediacontroller(self, url: str):
+        data = {
+            url: url
+        }
+        req = Request(self.media_controller_url + '/play', json.dumps(data), {"Content-Type": "application/json"})
+        return urlopen(req)
+
     def process(self, vc):
         search_query = self._extract_search_query(vc)
 
-        # old way
-        # audio_url = self._get_audio_file(self.provider_url, search_query)
         info = self._get_audio_info(self.provider_url, search_query)
         audio_url = info['absolutePath']
 
@@ -74,14 +76,12 @@ class PlayYoutubeVoiceCommand(ConfigurableVoiceCommand):
         else:
             message = "Spielt Datei %s" % info['filename']
 
-        # make a DLNA player and player
-        from dlna.dlna.renderer import Renderer
-        from dlna.dlna.player import Player
-
-        target_name = None
-        renderer_url = self._get_renderer_url(target_name)
-        player = Player(Renderer(target_name, renderer_url, False))
-
-        player.play(audio_url)
-
-        return ProcessResult("Youtube Media Player", True, message)
+        try:
+            response = self._send_to_mediacontroller(audio_url)
+            response_data = json.loads(response.read())
+            if response_data.get('running', None):
+                return ProcessResult("Youtube Media Player", True, message)
+            else:
+                return ProcessResult("Youtube Media Player", False, "Fehler beim Abspielen")
+        except Exception:
+            return ProcessResult("Youtube Media Player", False, "Fehler beim Suchen")

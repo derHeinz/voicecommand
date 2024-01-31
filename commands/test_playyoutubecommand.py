@@ -5,10 +5,11 @@ from .playyoutubecommand import PlayYoutubeVoiceCommand
 class TestPlayYoutubeVoiceCommand(unittest.TestCase):
 
     def _testee(sef):
-        return PlayYoutubeVoiceCommand({"renderers":{"Radio":"url"}, "youtube_audio_provider_url":"url"})
+        return PlayYoutubeVoiceCommand({"media_controller_url": "url", "youtube_audio_provider_url": "url"})
 
     def test_can_process(self):
-        positive_list = ["Youtube spiele Queen", "youtube spiel Heavy von Queen", "youtube spiel Another One bite the dust", "YouTube spiele meine Oma fährt im Hühnerstall Motorrad"]
+        positive_list = ["Youtube spiele Queen", "youtube spiel Heavy von Queen", "youtube spiel Another One bite the dust", 
+                         "YouTube spiele meine Oma fährt im Hühnerstall Motorrad"]
         for text in positive_list:
             self.assertTrue(self._testee().can_process(text))
 
