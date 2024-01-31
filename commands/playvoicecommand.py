@@ -143,7 +143,8 @@ class PlayVoiceCommand(ConfigurableVoiceCommand):
         return DetectedCommand(artist=tat.artist, title=tat.title, target=tat.target, loop=loop)
 
     def _send_to_mediacontroller(self, command: DetectedCommand):
-        req = Request(self.media_controller_url + '/play', json.dumps(command.__dict__), {"Content-Type": "application/json"})
+        data = json.dumps(command.__dict__).encode('utf-8')
+        req = Request(self.media_controller_url + '/play', data, {"Content-Type": "application/json"})
         return urlopen(req)
 
     def process(self, vc):

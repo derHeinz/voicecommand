@@ -30,14 +30,16 @@ class TestPlayVoiceCommand(unittest.TestCase):
     def test_send_to_mediacontroller(self, mock_urlopen, request_mock):
 
         self._testee()._send_to_mediacontroller(DetectedCommand('asfd'))
-        request_mock.assert_called_with('url/play', '{"artist": "asfd", "title": null, "target": null, "loop": false}',
+        request_mock.assert_called_with('url/play', '{"artist": "asfd", "title": null, "target": null, "loop": false}'
+                                        .encode('utf-8'),
                                         {'Content-Type': 'application/json'})
         mock_urlopen.assert_called()
 
         request_mock.reset_mock()
         mock_urlopen.reset_mock()
         self._testee()._send_to_mediacontroller(DetectedCommand(title='foo', artist='bar', loop=True))
-        request_mock.assert_called_with('url/play', '{"artist": "bar", "title": "foo", "target": null, "loop": true}',
+        request_mock.assert_called_with('url/play', '{"artist": "bar", "title": "foo", "target": null, "loop": true}'
+                                        .encode('utf-8'),
                                         {'Content-Type': 'application/json'})
         mock_urlopen.assert_called()
 
@@ -51,7 +53,8 @@ class TestPlayVoiceCommand(unittest.TestCase):
         pr = self._testee().process('Spiele Show must go on von Queen auf Radio')
 
         request_mock.assert_called_with('url/play',
-                                        '{"artist": "Queen", "title": "Show must go on", "target": "Radio", "loop": false}',
+                                        '{"artist": "Queen", "title": "Show must go on", "target": "Radio", "loop": false}'
+                                        .encode('utf-8'),
                                         {'Content-Type': 'application/json'})
         mock_urlopen.assert_called()
         self.assertEqual(pr.get_message(), "Spielt ein tolles Lied einer sagenhaften Band")
