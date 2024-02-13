@@ -2,8 +2,8 @@ from urllib.parse import quote
 from urllib.request import urlopen, Request
 import json
 
-from .voicecommand import ConfigurableVoiceCommand
-from .process_result import ProcessResult
+from commands.voicecommand import ConfigurableVoiceCommand
+from commands.process_result import ProcessResult
 
 
 class PlayYoutubeVoiceCommand(ConfigurableVoiceCommand):
@@ -59,9 +59,10 @@ class PlayYoutubeVoiceCommand(ConfigurableVoiceCommand):
 
     def _send_to_mediacontroller(self, url: str):
         data = {
-            url: url
+            "url": url
         }
-        req = Request(self.media_controller_url + '/play', json.dumps(data), {"Content-Type": "application/json"})
+        data_encoded = json.dumps(data).encode('utf-8')
+        req = Request(self.media_controller_url + '/play', data_encoded, {"Content-Type": "application/json"})
         return urlopen(req)
 
     def process(self, vc):
