@@ -65,7 +65,7 @@ class PlayYoutubeVoiceCommand(ConfigurableVoiceCommand):
         req = Request(self.media_controller_url + '/play', data_encoded, {"Content-Type": "application/json"})
         return urlopen(req)
 
-    def process(self, vc):
+    def process(self, vc) -> ProcessResult:
         search_query = self._extract_search_query(vc)
 
         info = self._get_audio_info(self.provider_url, search_query)
@@ -84,5 +84,5 @@ class PlayYoutubeVoiceCommand(ConfigurableVoiceCommand):
                 return ProcessResult("Youtube Media Player", True, message)
             else:
                 return ProcessResult("Youtube Media Player", False, "Fehler beim Abspielen")
-        except Exception:
-            return ProcessResult("Youtube Media Player", False, "Fehler beim Suchen")
+        except Exception as e:
+            return ProcessResult("Youtube Media Player", False, "Fehler beim Suchen", e)

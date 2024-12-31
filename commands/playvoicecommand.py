@@ -147,7 +147,7 @@ class PlayVoiceCommand(ConfigurableVoiceCommand):
         req = Request(self.media_controller_url + '/play', data, {"Content-Type": "application/json"})
         return urlopen(req)
 
-    def process(self, vc):
+    def process(self, vc) -> ProcessResult:
         com = self._parse(vc)
 
         if (not com):
@@ -159,8 +159,8 @@ class PlayVoiceCommand(ConfigurableVoiceCommand):
             description = response_data.get('description', None)
             running = response_data.get('running', None)
             return ProcessResult("Media Player", running, description)
-        except Exception:
-            return ProcessResult("Media Player", False, "Fehler")
+        except Exception as e:
+            return ProcessResult("Media Player", False, "Fehler", e)
 
 
 def log(txt):

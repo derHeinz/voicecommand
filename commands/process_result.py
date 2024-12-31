@@ -1,9 +1,10 @@
 class ProcessResult():
 
-    def __init__(self, t: str, s: bool, m: str):
+    def __init__(self, t: str, s: bool, m: str, e: Exception = None):
         self.type = t
         self.success = s
         self.message = m
+        self.error = e
 
     def is_sucess(self) -> bool:
         return self.success
@@ -16,3 +17,6 @@ class ProcessResult():
 
     def get_message(self) -> str:
         return self.message
+
+    def get_error(self) -> Exception:
+        return self.error

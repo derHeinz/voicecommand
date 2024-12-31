@@ -2,6 +2,7 @@ import sys
 import inspect
 import os
 
+from commands.process_result import ProcessResult
 from commands.playvoicecommand import PlayVoiceCommand
 from commands.switchitemsvoicecommand import SwitchItemsVoiceCommand
 from commands.alarmclockvoicecommand import AlarmClockVoiceCommand
@@ -30,7 +31,7 @@ def reference_modules():
     sys.path.insert(0, cmd_parent_folder)
 
 
-def send_data_to_openhab(result, vc):
+def send_data_to_openhab(result: ProcessResult, vc):
     config_data = config_helper.load_config_files("/voiceconfig.json")
 
     msg = "nicht verarbeitbar: '{}'".format(vc)
@@ -38,6 +39,9 @@ def send_data_to_openhab(result, vc):
     if result is not None:
         msg = result.get_message()
         processor = result.get_type()
+
+        if result.get_error():
+            print(result.get_error())
 
     from raspberrypi_python import postopenhab
     postopenhab.post_value_to_openhab(config_data['openhab_processor_name_item'], processor)

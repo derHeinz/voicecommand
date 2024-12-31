@@ -82,7 +82,7 @@ class AlarmClockVoiceCommand(ConfigurableVoiceCommand):
         time = self._legal_time_format(rest)
         return time
 
-    def process(self, vc):
+    def process(self, vc) -> ProcessResult:
 
         from raspberrypi_python import radioalarmclockIntegration
         r = radioalarmclockIntegration.RadioAlarmClock(self.ALARMCLOCKIP)

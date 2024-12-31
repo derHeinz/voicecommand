@@ -61,6 +61,23 @@ class TestPlayVoiceCommand(unittest.TestCase):
         self.assertEqual(pr.get_type(), "Media Player")
         self.assertEqual(True, pr.is_sucess())
 
+    @patch('commands.playvoicecommand.Request')
+    @patch('commands.playvoicecommand.urlopen')
+    def test_process_error(self, mock_urlopen, request_mock):
+        mock_urlopen.side_effect = Exception("test-4711")
+
+        pr = self._testee().process('Spiele Show must go on von Queen auf Radio')
+
+        request_mock.assert_called_with('url/play',
+                                        '{"artist": "Queen", "title": "Show must go on", "target": "Radio", "loop": false}'
+                                        .encode('utf-8'),
+                                        {'Content-Type': 'application/json'})
+        mock_urlopen.assert_called()
+        self.assertEqual(pr.get_message(), "Fehler")
+        self.assertEqual(pr.get_type(), "Media Player")
+        self.assertEqual(False, pr.is_sucess())
+        self.assertEqual("test-4711", str(pr.get_error()))
+
     def test_parse_rest(self):
         self.assertEqual(("Hammer", None, None), self._testee()._parse_rest("Hammer", False))
         self.assertEqual(("Hammer", "Queen", "Radio"), self._testee()._parse_rest("Hammer von Queen auf Radio", False))

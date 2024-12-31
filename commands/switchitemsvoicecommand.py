@@ -33,7 +33,7 @@ class SwitchItemsVoiceCommand(ConfigurableVoiceCommand):
     def can_process(self, vc):
         return self._contains_signal_word(vc)
 
-    def process(self, vc):
+    def process(self, vc) -> ProcessResult:
         signalword = self._signal_word(vc)
         command = self.COMMAND_MAPPINGS[signalword]
         extracted_items = self._openhab_items(vc)
