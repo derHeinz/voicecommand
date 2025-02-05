@@ -43,7 +43,6 @@ def send_data_to_openhab(result: ProcessResult, vc):
 
         if result.get_error():
             print(result.get_error())
-            traceback.extract_tb(result.get_error())
 
     from raspberrypi_python import postopenhab
     postopenhab.post_value_to_openhab(config_data['openhab_processor_name_item'], processor)

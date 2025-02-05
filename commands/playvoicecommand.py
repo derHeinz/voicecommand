@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from collections import namedtuple
 import json
 from urllib.request import urlopen, Request
+from urllib.error import HTTPError
 
 from commands.voicecommand import ConfigurableVoiceCommand
 from commands.process_result import ProcessResult
@@ -142,10 +143,19 @@ class PlayVoiceCommand(ConfigurableVoiceCommand):
 
         return DetectedCommand(artist=tat.artist, title=tat.title, target=tat.target, loop=loop)
 
-    def _send_to_mediacontroller(self, command: DetectedCommand):
+    def _send_to_mediacontroller(self, command: DetectedCommand) -> ProcessResult:
         data = json.dumps(command.__dict__).encode('utf-8')
         req = Request(self.media_controller_url + '/play', data, {"Content-Type": "application/json"})
-        return urlopen(req)
+        try:
+            response = urlopen(req)
+            response_data = json.loads(response.read())
+            description = response_data.get('description', None)
+            running = response_data.get('running', None)
+            return ProcessResult("Media Player", running, description)
+        except Exception as e:
+            if isinstance(e, HTTPError) and e.code == 404:
+                return ProcessResult("Media Player", False, "Keinen Titel gefunden", e)
+            return ProcessResult("Media Player", False, "Fehler", e)
 
     def process(self, vc) -> ProcessResult:
         com = self._parse(vc)
@@ -153,14 +163,7 @@ class PlayVoiceCommand(ConfigurableVoiceCommand):
         if (not com):
             return None
 
-        try:
-            response = self._send_to_mediacontroller(com)
-            response_data = json.loads(response.read())
-            description = response_data.get('description', None)
-            running = response_data.get('running', None)
-            return ProcessResult("Media Player", running, description)
-        except Exception as e:
-            return ProcessResult("Media Player", False, "Fehler", e)
+        return self._send_to_mediacontroller(com)
 
 
 def log(txt):
