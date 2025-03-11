@@ -18,6 +18,7 @@ class DetectedCommand():
     title: str = None
     target: str = None
     loop: bool = False
+    type: str = None
 
 
 class PlayVoiceCommand(ConfigurableVoiceCommand):
@@ -100,9 +101,13 @@ class PlayVoiceCommand(ConfigurableVoiceCommand):
     (spiele?)                                           # signal word
     (\s+mir)?                                           # optional mir
     (?:
-    (?P<s1>\s+(?:(lied)|(song)|(das\s+lied)|(den\s+song)))|                 # P<rest> is title
-    (?P<s2>\s+(?:(ein\s+lied)|(ein\s+song)|(einen\s+song)|(etwas)|(was)))|  # P<rest> is unkonwn
-    (?P<loop>\s+(?:(Lieder)|(Songs)))
+    (?P<a1>\s+(?:(lied)|(song)|(das\s+lied)|(den\s+song)))|                  # P<rest> is title, type is audio
+    (?P<a2>\s+(?:(ein\s+lied)|(ein\s+song)|(einen\s+song)))|                 # P<rest> is unkonwn, type is audio
+    (?P<v1>\s+(?:(das\s+Video)|(den\s+Film)))|                               # P<rest> is title, type is video
+    (?P<v2>\s+(?:(ein\s+Video)|(ein\s+Film)|(einen\s+Film)))|                # P<rest> is unkonwn, type is video
+    (?P<uk>\s+(?:(etwas)|(was)))|                                            # P<rest> is unknown, type is unknown
+    (?P<aLoop>\s+(?:(Lieder)|(Songs)))|                                      # type is audio
+    (?P<vLoop>\s+(?:(Videos)|(Filme)))                                       # type is video
     )?
     (?:\s+(?:(?P<von>von)|(?P<mit>mit)))?               # P<rest> is artist or title (regardless of previous)
     (?:(?P<rest>(?:(\s+\w+)+)))                         # rest what to play
@@ -115,21 +120,29 @@ class PlayVoiceCommand(ConfigurableVoiceCommand):
         rest_starts_with_title = True  # meaning rest is artist
         rest_starts_with_artist = False
         loop = False
+        typ = None
 
         m: Match = self.SINGLE_PATTERN.match(txt)
         if not m:
             return False
         if not m.group('rest'):
             return False
+        
+        if m.group('a1') or m.group('a2') or m.group('aLoop'):
+            typ = 'audio'
+        if m.group('v1') or m.group('v2') or m.group('vLoop'):
+            typ = 'video'
+        if m.group('uk'):
+            typ = None
 
-        if m.group('s1'):
+        if m.group('a1') or m.group('v1'):
             rest_starts_with_title = True
         if m.group('mit'):
             rest_starts_with_title = True
         if m.group('von'):
             rest_starts_with_title = False
             rest_starts_with_artist = True
-        if m.group('loop'):
+        if m.group('aLoop') or m.group('vLoop'):
             loop = True
 
         rest_stripped = m.group('rest').strip()
@@ -141,7 +154,7 @@ class PlayVoiceCommand(ConfigurableVoiceCommand):
         else:
             raise ValueError('Whoopsy artist or title?')
 
-        return DetectedCommand(artist=tat.artist, title=tat.title, target=tat.target, loop=loop)
+        return DetectedCommand(artist=tat.artist, title=tat.title, target=tat.target, loop=loop, type=typ)
 
     def _send_to_mediacontroller(self, command: DetectedCommand) -> ProcessResult:
         data = json.dumps(command.__dict__).encode('utf-8')

@@ -10,7 +10,8 @@ class TestPlayVoiceCommand(unittest.TestCase):
 
     def test_can_process(self):
         positive_list = ["spiele Lied", "spiel Heavy von Queen", "spiel Bohemian", "spiele eine Lied", 
-                         "Spiele etwas von Queen.", "spiel Show must go on.", "spiel Show must go on "]
+                         "Spiele etwas von Queen.", "spiel Show must go on.", "spiel Show must go on "
+                         "Spiele Filme von Ronald", "spiel ein Video mit Boxern"]
         for text in positive_list:
             self.assertTrue(self._testee().can_process(text))
 
@@ -19,18 +20,19 @@ class TestPlayVoiceCommand(unittest.TestCase):
             self.assertFalse(self._testee().can_process(text))
 
     def _check_detected_command(self, dc: DetectedCommand, artist: str = None, title: str = None,
-                                loop: bool = False, target: str = None):
+                                loop: bool = False, target: str = None, typ: str = None):
         self.assertEqual(artist, dc.artist)
         self.assertEqual(title, dc.title)
         self.assertEqual(loop, dc.loop)
         self.assertEqual(target, dc.target)
+        self.assertEqual(typ, dc.type)
 
     @patch('commands.playvoicecommand.Request')
     @patch('commands.playvoicecommand.urlopen')
     def test_send_to_mediacontroller(self, mock_urlopen, request_mock):
 
         self._testee()._send_to_mediacontroller(DetectedCommand('asfd'))
-        request_mock.assert_called_with('url/play', '{"artist": "asfd", "title": null, "target": null, "loop": false}'
+        request_mock.assert_called_with('url/play', '{"artist": "asfd", "title": null, "target": null, "loop": false, "type": null}'
                                         .encode('utf-8'),
                                         {'Content-Type': 'application/json'})
         mock_urlopen.assert_called()
@@ -38,7 +40,7 @@ class TestPlayVoiceCommand(unittest.TestCase):
         request_mock.reset_mock()
         mock_urlopen.reset_mock()
         self._testee()._send_to_mediacontroller(DetectedCommand(title='foo', artist='bar', loop=True))
-        request_mock.assert_called_with('url/play', '{"artist": "bar", "title": "foo", "target": null, "loop": true}'
+        request_mock.assert_called_with('url/play', '{"artist": "bar", "title": "foo", "target": null, "loop": true, "type": null}'
                                         .encode('utf-8'),
                                         {'Content-Type': 'application/json'})
         mock_urlopen.assert_called()
@@ -53,7 +55,7 @@ class TestPlayVoiceCommand(unittest.TestCase):
         pr = self._testee().process('Spiele Show must go on von Queen auf Radio')
 
         request_mock.assert_called_with('url/play',
-                                        '{"artist": "Queen", "title": "Show must go on", "target": "Radio", "loop": false}'
+                                        '{"artist": "Queen", "title": "Show must go on", "target": "Radio", "loop": false, "type": null}'
                                         .encode('utf-8'),
                                         {'Content-Type': 'application/json'})
         mock_urlopen.assert_called()
@@ -69,7 +71,7 @@ class TestPlayVoiceCommand(unittest.TestCase):
         pr = self._testee().process('Spiele Show must go on von Queen auf Radio')
 
         request_mock.assert_called_with('url/play',
-                                        '{"artist": "Queen", "title": "Show must go on", "target": "Radio", "loop": false}'
+                                        '{"artist": "Queen", "title": "Show must go on", "target": "Radio", "loop": false, "type": null}'
                                         .encode('utf-8'),
                                         {'Content-Type': 'application/json'})
         mock_urlopen.assert_called()
@@ -91,27 +93,42 @@ class TestPlayVoiceCommand(unittest.TestCase):
         self.assertEqual(("Hammer", "Queen", None), self._testee()._parse_rest("Queen mit Hammer", True))
         self.assertEqual(("Hammer", "Queen", "Radio"), self._testee()._parse_rest("Queen mit Hammer auf Radio", True))       
 
-    def test_parse_single_song_title(self):
+    def test_parse_single_title(self):
+        # can be any media type
         self._check_detected_command(self._testee()._parse("spiel Show must go on"), title="Show must go on")
         self._check_detected_command(self._testee()._parse("spiele Show must go on"), title="Show must go on")
         self._check_detected_command(self._testee()._parse("spiele Show must go on;"), title="Show must go on")
         self._check_detected_command(self._testee()._parse("Spiele Show must go on"), title="Show must go on")
-        self._check_detected_command(self._testee()._parse("spiele Lied Show must go on"), title="Show must go on")
-        self._check_detected_command(self._testee()._parse("spiele Song Show must go on"), title="Show must go on")
-        self._check_detected_command(self._testee()._parse("spiel     Lied        Show must go on"), title="Show must go on")
-        self._check_detected_command(self._testee()._parse("spiele das Lied Show must go on"), title="Show must go on")
-        self._check_detected_command(self._testee()._parse("spiele den Song Show must go on"), title="Show must go on")
-        self._check_detected_command(self._testee()._parse("spiele mir den Song Show must go on"), title="Show must go on")
-        # mit
-        self._check_detected_command(self._testee()._parse("Spiele mir den Song mit Show must go on"), title="Show must go on")
-        self._check_detected_command(self._testee()._parse("Spiele das Lied    mit Show must go on"), title="Show must go on")
 
-    def test_parse_single_song_artist(self):
+    def test_parse_single_audio_title(self):
+        self._check_detected_command(self._testee()._parse("spiele Lied Show must go on"), title="Show must go on", typ="audio")
+        self._check_detected_command(self._testee()._parse("spiele Song Show must go on"), title="Show must go on", typ="audio")
+        self._check_detected_command(self._testee()._parse("spiel     Lied        Show must go on"), title="Show must go on", typ="audio")
+        self._check_detected_command(self._testee()._parse("spiele das Lied Show must go on"), title="Show must go on", typ="audio")
+        self._check_detected_command(self._testee()._parse("spiele den Song Show must go on"), title="Show must go on", typ="audio")
+        self._check_detected_command(self._testee()._parse("spiele mir den Song Show must go on"), title="Show must go on", typ="audio")
+        # mit
+        self._check_detected_command(self._testee()._parse("Spiele mir den Song mit Show must go on"), title="Show must go on", typ="audio")
+        self._check_detected_command(self._testee()._parse("Spiele das Lied    mit Show must go on"), title="Show must go on", typ="audio")
+
+    def test_parse_single_video_title(self):
+        self._check_detected_command(self._testee()._parse("spiele mir ein Video Snowfall"), title="Snowfall", typ="video")
+        # mit
+        self._check_detected_command(self._testee()._parse("Spiele einen Film mit Lebowski"), title="Lebowski", typ="video")
+
+    def test_parse_single_artist(self):
+        # any media type
         self._check_detected_command(self._testee()._parse("spiel etwas von Queen"), artist="Queen")
         self._check_detected_command(self._testee()._parse("spiel mir was von Queen"), artist="Queen")
         self._check_detected_command(self._testee()._parse("Spiel    MIR    Was     Von    Queen"), artist="Queen")
-        self._check_detected_command(self._testee()._parse("spiel mir ein Lied von Queen"), artist="Queen")
-        self._check_detected_command(self._testee()._parse("spiel einen Song von Queen"), artist="Queen")
+
+    def test_parse_single_audio_artist(self):
+        self._check_detected_command(self._testee()._parse("spiel mir ein Lied von Queen"), artist="Queen", typ="audio")
+        self._check_detected_command(self._testee()._parse("spiel einen Song von Queen"), artist="Queen", typ="audio")
+
+    def test_parse_single_video_artist(self):
+        self._check_detected_command(self._testee()._parse("spiel mir ein Video von Daniel"), artist="Daniel", typ="video")
+        self._check_detected_command(self._testee()._parse("spiel einen Film von Daniel"), artist="Daniel", typ="video")
 
     def test_parse_single(self):
         # title first
@@ -129,8 +146,12 @@ class TestPlayVoiceCommand(unittest.TestCase):
 
     def test_parse_multiple(self):
         self._check_detected_command(self._testee()._parse("spiele Lieder von Queen"),
-                                     artist="Queen", loop=True)
+                                     artist="Queen", loop=True, typ="audio")
         self._check_detected_command(self._testee()._parse("spiele Songs von Queen mit Hammer"),
-                                     title="Hammer", artist="Queen", loop=True)
+                                     title="Hammer", artist="Queen", loop=True, typ="audio")
         self._check_detected_command(self._testee()._parse("spiele Songs von Queen mit Hammer auf Radio"),
-                                     title="Hammer", artist="Queen", target="Radio", loop=True)
+                                     title="Hammer", artist="Queen", target="Radio", loop=True, typ="audio")
+        
+    def test_parse_special(self):
+        self._check_detected_command(self._testee()._parse("spiele den Film Etwas Wunderbares"),
+                                     title="Etwas Wunderbares", typ="video")
