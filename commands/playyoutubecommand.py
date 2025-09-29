@@ -31,19 +31,6 @@ class PlayYoutubeVoiceCommand(ConfigurableVoiceCommand):
                 rest = rest[len(k):].strip()
         return rest
 
-    def _get_audio_file(self, baseurl, searchquery):
-        searchquery_escaped = quote(searchquery)
-        url = baseurl + '/search/' + searchquery_escaped
-        header = {"Content-Type": "text/plain"}
-        req = Request(url, None, header)
-        path_to_audiofile = urlopen(req).read()  # will download and return url to the audio file as plaintext
-
-        path_to_audiofile = path_to_audiofile.decode('UTF-8')
-        path_to_audiofile = path_to_audiofile.strip()  # remove trailing line feed
-
-        escaped_path_to_audiofile = quote(path_to_audiofile)
-        return baseurl + escaped_path_to_audiofile
-
     def _get_audio_info(self, baseurl, searchquery):
         searchquery_escaped = quote(searchquery)
         url = baseurl + '/searchv2/' + searchquery_escaped
